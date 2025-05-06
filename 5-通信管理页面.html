@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>通信管理 - 地震破拆救援机器人控制系统</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script>tailwind.config={theme:{extend:{colors:{primary:'#FF5A07',secondary:'#475569'},borderRadius:{'none':'0px','sm':'4px',DEFAULT:'8px','md':'12px','lg':'16px','xl':'20px','2xl':'24px','3xl':'32px','full':'9999px','button':'8px'}}}}</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/remixicon@4.5.0/fonts/remixicon.css" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.5.0/echarts.min.js"></script>
+<style>
+:where([class^="ri-"])::before { content: "\f3c2"; }
+.status-dot {
+width: 8px;
+height: 8px;
+border-radius: 50%;
+display: inline-block;
+margin-right: 6px;
+}
+.status-dot.online { background-color: #22c55e; }
+.status-dot.offline { background-color: #ef4444; }
+.status-dot.warning { background-color: #f59e0b; }
+</style>
+</head>
+<body class="bg-gray-900 min-h-screen text-gray-100">
+<div class="flex h-screen">
+<aside class="w-64 bg-gray-800 shadow-lg">
+<div class="p-4 border-b">
+<img src="logo-white-03.svg" alt="VORTEX Logo" class="h-8 mb-2">
+<h1 class="text-xl font-bold text-primary">VORTEX控制系统</h1>
+</div>
+<nav class="p-4 space-y-2">
+<a href="1-系统控制界面.html" class="flex items-center p-3 text-gray-300 hover:bg-gray-700 rounded-button">
+<i class="ri-dashboard-line mr-3"></i>
+<span>系统概览</span>
+</a>
+<a href="2-远程控制页面.html" class="flex items-center p-3 text-gray-300 hover:bg-gray-700 rounded-button">
+<i class="ri-remote-control-line mr-3"></i>
+<span>远程控制</span>
+</a>
+<a href="3-环境感知.html" class="flex items-center p-3 text-gray-300 hover:bg-gray-700 rounded-button">
+<i class="ri-eye-line mr-3"></i>
+<span>环境感知</span>
+</a>
+<a href="4-破拆作业功能页面.html" class="flex items-center p-3 text-gray-300 hover:bg-gray-700 rounded-button">
+<i class="ri-tools-line mr-3"></i>
+<span>破拆作业</span>
+</a>
+<a href="5-通信管理页面.html" class="flex items-center p-3 bg-primary text-white rounded-button">
+<i class="ri-signal-tower-line mr-3"></i>
+<span>通信管理</span>
+</a>
+<a href="6-系统设置页面.html" class="flex items-center p-3 text-gray-300 hover:bg-gray-700 rounded-button">
+<i class="ri-settings-3-line mr-3"></i>
+<span>系统设置</span>
+</a>
+</nav>
+</aside>
+<main class="flex-1 overflow-auto">
+<header class="bg-gray-800 shadow-sm p-4">
+<div class="flex justify-between items-center">
+<div class="flex items-center space-x-4">
+<div class="flex items-center">
+<span class="status-dot online"></span>
+<span class="font-medium">通信状态: 正常</span>
+</div>
+<div class="flex items-center">
+<i class="ri-wifi-line text-green-500 mr-2"></i>
+<span>信号强度: 85%</span>
+</div>
+<div class="flex items-center">
+<i class="ri-speed-line text-green-500 mr-2"></i>
+<span>延迟: 45ms</span>
+</div>
+</div>
+<div class="flex items-center space-x-4">
+<button id="networkTest" class="bg-primary text-white px-4 py-2 rounded-button flex items-center">
+<i class="ri-speed-line mr-2"></i>
+网络测速
+</button>
+</div>
+</div>
+</header>
+<div class="p-6 grid grid-cols-2 gap-6">
+<div class="bg-gray-800 p-6 rounded-lg shadow">
+<div class="flex justify-between items-center mb-4">
+<h2 class="text-lg font-medium">网络连接状态</h2>
+<div class="flex items-center space-x-2">
+<button id="refreshStatus" class="text-gray-400 hover:text-white">
+<i class="ri-refresh-line text-xl"></i>
+</button>
+</div>
+</div>
+<div class="grid grid-cols-2 gap-4">
+<div class="bg-gray-700 p-4 rounded-lg">
+<div class="text-sm text-gray-400">连接类型</div>
+<div class="text-xl font-medium mt-1">5G</div>
+<div class="text-xs text-green-500 mt-1">优先级: 高</div>
+</div>
+<div class="bg-gray-700 p-4 rounded-lg">
+<div class="text-sm text-gray-400">IP地址</div>
+<div class="text-xl font-medium mt-1">192.168.1.100</div>
+<div class="text-xs text-blue-500 mt-1">内网地址</div>
+</div>
+<div class="bg-gray-700 p-4 rounded-lg">
+<div class="text-sm text-gray-400">信号强度</div>
+<div class="text-xl font-medium mt-1">-65 dBm</div>
+<div class="text-xs text-green-500 mt-1">信号良好</div>
+</div>
+<div class="bg-gray-700 p-4 rounded-lg">
+<div class="text-sm text-gray-400">连接时长</div>
+<div class="text-xl font-medium mt-1">2小时35分</div>
+<div class="text-xs text-gray-400 mt-1">稳定运行中</div>
+</div>
+</div>
+<div id="signalChart" class="h-48 mt-4"></div>
+</div>
+<div class="bg-gray-800 p-6 rounded-lg shadow">
+<div class="flex justify-between items-center mb-4">
+<h2 class="text-lg font-medium">数据传输监控</h2>
+<div class="flex items-center space-x-2">
+<span class="text-sm text-gray-400">实时</span>
+<button id="toggleAutoRefresh" class="relative inline-flex items-center h-6 rounded-full w-11 bg-gray-600">
+<span class="translate-x-6 inline-block w-4 h-4 transform bg-white rounded-full"></span>
+</button>
+</div>
+</div>
+<div id="transferChart" class="h-64"></div>
+<div class="grid grid-cols-2 gap-4 mt-4">
+<div class="bg-gray-700 p-4 rounded-lg">
+<div class="text-sm text-gray-400">上行速率</div>
+<div class="text-2xl font-medium">2.5 MB/s</div>
+</div>
+<div class="bg-gray-700 p-4 rounded-lg">
+<div class="text-sm text-gray-400">下行速率</div>
+<div class="text-2xl font-medium">3.8 MB/s</div>
+</div>
+</div>
+</div>
+<div class="bg-gray-800 p-6 rounded-lg shadow">
+<div class="flex justify-between items-center mb-4">
+<h2 class="text-lg font-medium">网络配置</h2>
+<button id="saveConfig" class="bg-primary text-white px-3 py-1 rounded-button text-sm">
+保存配置
+</button>
+</div>
+<div class="grid grid-cols-2 gap-4">
+<div class="space-y-2">
+<label class="block text-sm text-gray-400">通信模式</label>
+<select class="w-full bg-gray-700 border-none rounded p-2 text-white">
+<option>自动选择</option>
+<option>仅5G</option>
+<option>仅4G</option>
+<option>WiFi优先</option>
+</select>
+</div>
+<div class="space-y-2">
+<label class="block text-sm text-gray-400">带宽限制</label>
+<select class="w-full bg-gray-700 border-none rounded p-2 text-white">
+<option>无限制</option>
+<option>10Mbps</option>
+<option>20Mbps</option>
+<option>50Mbps</option>
+</select>
+</div>
+<div class="space-y-2">
+<label class="block text-sm text-gray-400">QoS策略</label>
+<select class="w-full bg-gray-700 border-none rounded p-2 text-white">
+<option>控制优先</option>
+<option>视频优先</option>
+<option>平衡模式</option>
+</select>
+</div>
+<div class="space-y-2">
+<label class="block text-sm text-gray-400">心跳间隔</label>
+<select class="w-full bg-gray-700 border-none rounded p-2 text-white">
+<option>100ms</option>
+<option>200ms</option>
+<option>500ms</option>
+</select>
+</div>
+</div>
+</div>
+<div class="bg-gray-800 p-6 rounded-lg shadow">
+<div class="flex justify-between items-center mb-4">
+<h2 class="text-lg font-medium">连接历史记录</h2>
+<button id="exportLog" class="flex items-center text-gray-400 hover:text-white">
+<i class="ri-download-line mr-1"></i>
+导出
+</button>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full">
+<thead>
+<tr class="text-left text-gray-400">
+<th class="pb-3">时间</th>
+<th class="pb-3">类型</th>
+<th class="pb-3">状态</th>
+<th class="pb-3">延迟</th>
+<th class="pb-3">信号强度</th>
+</tr>
+</thead>
+<tbody class="text-sm">
+<tr class="border-t border-gray-700">
+<td class="py-2">2025-03-13 14:30</td>
+<td>5G</td>
+<td class="text-green-500">连接成功</td>
+<td>45ms</td>
+<td>-65dBm</td>
+</tr>
+<tr class="border-t border-gray-700">
+<td class="py-2">2025-03-13 14:25</td>
+<td>5G</td>
+<td class="text-yellow-500">信号不稳定</td>
+<td>78ms</td>
+<td>-75dBm</td>
+</tr>
+<tr class="border-t border-gray-700">
+<td class="py-2">2025-03-13 14:20</td>
+<td>4G</td>
+<td class="text-red-500">连接断开</td>
+<td>120ms</td>
+<td>-85dBm</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</main>
+</div>
+<script>
+const mockData = {
+signalStrength: {
+timestamps: ['14:25', '14:26', '14:27', '14:28', '14:29', '14:30'],
+values: [-75, -72, -68, -67, -66, -65]
+},
+transfer: {
+timestamps: ['14:25', '14:26', '14:27', '14:28', '14:29', '14:30'],
+upload: [2.1, 2.3, 2.4, 2.5, 2.5, 2.5],
+download: [3.2, 3.4, 3.6, 3.7, 3.8, 3.8]
+}
+};
+const signalChart = echarts.init(document.getElementById('signalChart'));
+signalChart.setOption({
+animation: false,
+grid: {
+top: 20,
+right: 20,
+bottom: 30,
+left: 50
+},
+xAxis: {
+type: 'category',
+data: mockData.signalStrength.timestamps,
+axisLine: { lineStyle: { color: '#4b5563' } }
+},
+yAxis: {
+type: 'value',
+name: 'dBm',
+axisLine: { lineStyle: { color: '#4b5563' } }
+},
+series: [{
+data: mockData.signalStrength.values,
+type: 'line',
+smooth: true,
+lineStyle: { color: 'rgba(87, 181, 231, 1)' },
+areaStyle: {
+color: {
+type: 'linear',
+x: 0, y: 0, x2: 0, y2: 1,
+colorStops: [{
+offset: 0,
+color: 'rgba(87, 181, 231, 0.2)'
+}, {
+offset: 1,
+color: 'rgba(87, 181, 231, 0)'
+}]
+}
+}
+}]
+});
+const transferChart = echarts.init(document.getElementById('transferChart'));
+transferChart.setOption({
+animation: false,
+grid: {
+top: 30,
+right: 20,
+bottom: 30,
+left: 50
+},
+legend: {
+data: ['上行速率', '下行速率'],
+textStyle: { color: '#e5e7eb' }
+},
+xAxis: {
+type: 'category',
+data: mockData.transfer.timestamps,
+axisLine: { lineStyle: { color: '#4b5563' } }
+},
+yAxis: {
+type: 'value',
+name: 'MB/s',
+axisLine: { lineStyle: { color: '#4b5563' } }
+},
+series: [{
+name: '上行速率',
+data: mockData.transfer.upload,
+type: 'line',
+smooth: true,
+lineStyle: { color: 'rgba(141, 211, 199, 1)' },
+areaStyle: {
+color: {
+type: 'linear',
+x: 0, y: 0, x2: 0, y2: 1,
+colorStops: [{
+offset: 0,
+color: 'rgba(141, 211, 199, 0.2)'
+}, {
+offset: 1,
+color: 'rgba(141, 211, 199, 0)'
+}]
+}
+}
+}, {
+name: '下行速率',
+data: mockData.transfer.download,
+type: 'line',
+smooth: true,
+lineStyle: { color: 'rgba(251, 191, 114, 1)' },
+areaStyle: {
+color: {
+type: 'linear',
+x: 0, y: 0, x2: 0, y2: 1,
+colorStops: [{
+offset: 0,
+color: 'rgba(251, 191, 114, 0.2)'
+}, {
+offset: 1,
+color: 'rgba(251, 191, 114, 0)'
+}]
+}
+}
+}]
+});
+document.getElementById('networkTest').addEventListener('click', function() {
+const modal = document.createElement('div');
+modal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
+modal.innerHTML = `
+<div class="bg-gray-800 p-6 rounded-lg shadow-xl w-96">
+<h3 class="text-xl font-bold mb-4">网络测速</h3>
+<div class="space-y-4">
+<div class="bg-gray-700 p-4 rounded">
+<div class="flex justify-between items-center">
+<span>下载速度</span>
+<span class="text-green-500">35.8 Mbps</span>
+</div>
+<div class="w-full bg-gray-600 h-2 rounded-full mt-2">
+<div class="bg-green-500 h-2 rounded-full" style="width: 75%"></div>
+</div>
+</div>
+<div class="bg-gray-700 p-4 rounded">
+<div class="flex justify-between items-center">
+<span>上传速度</span>
+<span class="text-blue-500">28.3 Mbps</span>
+</div>
+<div class="w-full bg-gray-600 h-2 rounded-full mt-2">
+<div class="bg-blue-500 h-2 rounded-full" style="width: 60%"></div>
+</div>
+</div>
+<div class="bg-gray-700 p-4 rounded">
+<div class="flex justify-between items-center">
+<span>延迟</span>
+<span class="text-yellow-500">45 ms</span>
+</div>
+</div>
+</div>
+<div class="flex justify-end mt-6">
+<button class="px-4 py-2 bg-primary text-white rounded-button" onclick="this.closest('.fixed').remove()">关闭</button>
+</div>
+</div>
+`;
+document.body.appendChild(modal);
+});
+document.getElementById('saveConfig').addEventListener('click', function() {
+const notification = document.createElement('div');
+notification.className = 'fixed top-4 right-4 bg-green-500 text-white px-6 py-3 rounded shadow-lg z-50';
+notification.textContent = '配置已保存';
+document.body.appendChild(notification);
+setTimeout(() => notification.remove(), 3000);
+});
+window.addEventListener('resize', function() {
+signalChart.resize();
+transferChart.resize();
+});
+</script>
+</body>
+</html>

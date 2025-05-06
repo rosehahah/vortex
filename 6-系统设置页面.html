@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>系统设置 - 地震破拆救援机器人控制系统</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script>tailwind.config={theme:{extend:{colors:{primary:'#FF5A07',secondary:'#475569'},borderRadius:{'none':'0px','sm':'4px',DEFAULT:'8px','md':'12px','lg':'16px','xl':'20px','2xl':'24px','3xl':'32px','full':'9999px','button':'8px'}}}}</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/remixicon@4.5.0/fonts/remixicon.css" rel="stylesheet">
+<style>:where([class^="ri-"])::before { content: "\f3c2"; }</style>
+</head>
+<body class="bg-gray-900 min-h-screen text-gray-100">
+<div class="flex h-screen">
+<aside class="w-64 bg-gray-800 shadow-lg">
+<div class="p-4 border-b border-gray-700">
+<img src="logo-white-03.svg" alt="VORTEX Logo" class="h-8 mb-2">
+<h1 class="text-xl font-bold text-primary">VORTEX控制系统</h1>
+</div>
+<nav class="p-4 space-y-2">
+<a href="1-系统控制界面.html" class="flex items-center p-3 text-gray-300 hover:bg-gray-700 rounded-button">
+<i class="ri-dashboard-line mr-3"></i>
+<span>系统概览</span>
+</a>
+<a href="2-远程控制页面.html" class="flex items-center p-3 text-gray-300 hover:bg-gray-700 rounded-button">
+<i class="ri-remote-control-line mr-3"></i>
+<span>远程控制</span>
+</a>
+<a href="3-环境感知.html" class="flex items-center p-3 text-gray-300 hover:bg-gray-700 rounded-button">
+<i class="ri-eye-line mr-3"></i>
+<span>环境感知</span>
+</a>
+<a href="4-破拆作业功能页面.html" class="flex items-center p-3 text-gray-300 hover:bg-gray-700 rounded-button">
+<i class="ri-tools-line mr-3"></i>
+<span>破拆作业</span>
+</a>
+<a href="5-通信管理页面.html" class="flex items-center p-3 text-gray-300 hover:bg-gray-700 rounded-button">
+<i class="ri-signal-tower-line mr-3"></i>
+<span>通信管理</span>
+</a>
+<a href="6-系统设置页面.html" class="flex items-center p-3 bg-primary text-white rounded-button">
+<i class="ri-settings-3-line mr-3"></i>
+<span>系统设置</span>
+</a>
+</nav>
+</aside>
+
+<main class="flex-1 overflow-auto">
+<header class="bg-gray-800 shadow-sm p-4">
+<div class="flex justify-between items-center">
+<h2 class="text-xl font-medium">系统设置</h2>
+<div class="flex items-center space-x-4">
+<span class="text-gray-400">系统版本: v2.5.3</span>
+<button id="saveAllBtn" class="bg-primary text-white px-4 py-2 rounded-button flex items-center cursor-pointer">
+<i class="ri-save-line mr-2"></i>保存全部设置
+</button>
+</div>
+</div>
+</header>
+
+<div class="p-6 grid grid-cols-2 gap-6">
+<div class="bg-gray-800 p-6 rounded-lg shadow">
+<div class="flex justify-between items-center mb-6">
+<h3 class="text-lg font-medium">基本参数配置</h3>
+<button class="text-primary hover:text-primary/80 cursor-pointer">
+<i class="ri-save-line text-xl"></i>
+</button>
+</div>
+<div class="space-y-4">
+<div>
+<label class="block text-sm font-medium text-gray-300 mb-2">设备名称</label>
+<input type="text" class="w-full bg-gray-700 border-none rounded-button px-4 py-2 text-sm" value="救援机器人-A01" placeholder="请输入设备名称">
+</div>
+<div>
+<label class="block text-sm font-medium text-gray-300 mb-2">设备 ID</label>
+<input type="text" class="w-full bg-gray-700 border-none rounded-button px-4 py-2 text-sm" value="RR2025031301" placeholder="请输入设备ID">
+</div>
+<div>
+<label class="block text-sm font-medium text-gray-300 mb-2">设备描述</label>
+<textarea class="w-full bg-gray-700 border-none rounded-button px-4 py-2 text-sm h-24" placeholder="请输入设备描述">用于地震灾害现场的破拆救援作业，具备远程操控、环境感知、破拆作业等功能。</textarea>
+</div>
+<div>
+<label class="block text-sm font-medium text-gray-300 mb-2">时区设置</label>
+<div class="relative">
+<button id="timezoneBtn" class="w-full bg-gray-700 px-4 py-2 rounded-button text-left text-sm flex justify-between items-center cursor-pointer">
+<span>UTC+8 北京时间</span>
+<i class="ri-arrow-down-s-line"></i>
+</button>
+<div id="timezoneDropdown" class="hidden absolute top-full left-0 w-full mt-1 bg-gray-700 rounded-button shadow-lg z-10">
+<div class="p-2 hover:bg-gray-600 cursor-pointer">UTC+8 北京时间</div>
+<div class="p-2 hover:bg-gray-600 cursor-pointer">UTC+9 东京时间</div>
+<div class="p-2 hover:bg-gray-600 cursor-pointer">UTC+0 格林威治时间</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="bg-gray-800 p-6 rounded-lg shadow">
+<div class="flex justify-between items-center mb-6">
+<h3 class="text-lg font-medium">网络设置</h3>
+<button class="text-primary hover:text-primary/80 cursor-pointer">
+<i class="ri-save-line text-xl"></i>
+</button>
+</div>
+<div class="space-y-4">
+<div>
+<label class="block text-sm font-medium text-gray-300 mb-2">WiFi 网络</label>
+<div class="space-y-2">
+<div class="flex items-center justify-between bg-gray-700 px-4 py-3 rounded-button">
+<div class="flex items-center">
+<i class="ri-wifi-line mr-2"></i>
+<span>Emergency_Network_5G</span>
+</div>
+<span class="text-green-500">已连接</span>
+</div>
+<div class="flex items-center justify-between bg-gray-700 px-4 py-3 rounded-button cursor-pointer hover:bg-gray-600">
+<div class="flex items-center">
+<i class="ri-wifi-line mr-2"></i>
+<span>Rescue_Team_2.4G</span>
+</div>
+<span class="text-gray-400">可用</span>
+</div>
+</div>
+</div>
+<div>
+<label class="block text-sm font-medium text-gray-300 mb-2">通信协议</label>
+<div class="grid grid-cols-2 gap-2">
+<button class="bg-primary text-white px-4 py-2 rounded-button">TCP/IP</button>
+<button class="bg-gray-700 text-gray-300 px-4 py-2 rounded-button">UDP</button>
+</div>
+</div>
+<div>
+<label class="block text-sm font-medium text-gray-300 mb-2">端口设置</label>
+<div class="flex space-x-2">
+<input type="text" class="flex-1 bg-gray-700 border-none rounded-button px-4 py-2 text-sm" value="8080" placeholder="控制端口">
+<input type="text" class="flex-1 bg-gray-700 border-none rounded-button px-4 py-2 text-sm" value="8081" placeholder="数据端口">
+</div>
+</div>
+</div>
+</div>
+
+<div class="bg-gray-800 p-6 rounded-lg shadow">
+<div class="flex justify-between items-center mb-6">
+<h3 class="text-lg font-medium">传感器校准</h3>
+<button class="text-primary hover:text-primary/80 cursor-pointer">
+<i class="ri-save-line text-xl"></i>
+</button>
+</div>
+<div class="space-y-4">
+<div>
+<label class="block text-sm font-medium text-gray-300 mb-2">摄像头参数</label>
+<div class="grid grid-cols-2 gap-4">
+<div>
+<label class="block text-xs text-gray-400 mb-1">亮度</label>
+<input type="range" class="w-full" min="0" max="100" value="60">
+</div>
+<div>
+<label class="block text-xs text-gray-400 mb-1">对比度</label>
+<input type="range" class="w-full" min="0" max="100" value="50">
+</div>
+</div>
+</div>
+<div>
+<label class="block text-sm font-medium text-gray-300 mb-2">陀螺仪校准</label>
+<button class="w-full bg-gray-700 text-white px-4 py-2 rounded-button flex items-center justify-center cursor-pointer" id="calibrateBtn">
+<i class="ri-refresh-line mr-2"></i>
+开始校准
+</button>
+</div>
+<div>
+<label class="block text-sm font-medium text-gray-300 mb-2">传感器状态</label>
+<div class="space-y-2">
+<div class="flex justify-between items-center bg-gray-700 px-4 py-2 rounded-button">
+<span>温度传感器</span>
+<span class="text-green-500">正常</span>
+</div>
+<div class="flex justify-between items-center bg-gray-700 px-4 py-2 rounded-button">
+<span>气压传感器</span>
+<span class="text-green-500">正常</span>
+</div>
+<div class="flex justify-between items-center bg-gray-700 px-4 py-2 rounded-button">
+<span>烟雾传感器</span>
+<span class="text-yellow-500">需校准</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="bg-gray-800 p-6 rounded-lg shadow">
+<div class="flex justify-between items-center mb-6">
+<h3 class="text-lg font-medium">系统维护</h3>
+<button class="text-primary hover:text-primary/80 cursor-pointer">
+<i class="ri-save-line text-xl"></i>
+</button>
+</div>
+<div class="space-y-4">
+<div>
+<label class="block text-sm font-medium text-gray-300 mb-2">固件更新</label>
+<div class="bg-gray-700 p-4 rounded-button">
+<div class="flex justify-between items-center mb-2">
+<span>当前版本：v2.5.3</span>
+<span class="text-primary">发现新版本：v2.5.4</span>
+</div>
+<button class="w-full bg-primary text-white px-4 py-2 mt-2 rounded-button cursor-pointer" id="updateBtn">
+立即更新
+</button>
+</div>
+</div>
+<div>
+<label class="block text-sm font-medium text-gray-300 mb-2">系统日志</label>
+<div class="flex space-x-2">
+<button class="flex-1 bg-gray-700 text-white px-4 py-2 rounded-button cursor-pointer">
+<i class="ri-file-download-line mr-2"></i>导出日志
+</button>
+<button class="flex-1 bg-gray-700 text-white px-4 py-2 rounded-button cursor-pointer">
+<i class="ri-delete-bin-line mr-2"></i>清除日志
+</button>
+</div>
+</div>
+<div>
+<label class="block text-sm font-medium text-gray-300 mb-2">系统重置</label>
+<button class="w-full bg-red-500 text-white px-4 py-2 rounded-button cursor-pointer" id="resetBtn">
+<i class="ri-restart-line mr-2"></i>恢复出厂设置
+</button>
+</div>
+</div>
+</div>
+</div>
+</main>
+</div>
+
+<div id="modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+<div class="bg-gray-800 p-6 rounded-lg shadow-xl max-w-md w-full">
+<h3 class="text-lg font-medium mb-4" id="modalTitle"></h3>
+<p class="text-gray-300 mb-6" id="modalContent"></p>
+<div class="flex justify-end space-x-4">
+<button class="px-4 py-2 bg-gray-700 text-white rounded-button cursor-pointer" id="modalCancelBtn">取消</button>
+<button class="px-4 py-2 bg-primary text-white rounded-button cursor-pointer" id="modalConfirmBtn">确认</button>
+</div>
+</div>
+</div>
+
+<script>
+const modal = document.getElementById('modal');
+const modalTitle = document.getElementById('modalTitle');
+const modalContent = document.getElementById('modalContent');
+const modalCancelBtn = document.getElementById('modalCancelBtn');
+const modalConfirmBtn = document.getElementById('modalConfirmBtn');
+
+function showModal(title, content, onConfirm) {
+modalTitle.textContent = title;
+modalContent.textContent = content;
+modal.classList.remove('hidden');
+modalConfirmBtn.onclick = () => {
+onConfirm();
+modal.classList.add('hidden');
+};
+modalCancelBtn.onclick = () => modal.classList.add('hidden');
+}
+
+document.getElementById('timezoneBtn').onclick = function() {
+const dropdown = document.getElementById('timezoneDropdown');
+dropdown.classList.toggle('hidden');
+};
+
+document.getElementById('calibrateBtn').onclick = function() {
+showModal(
+'开始校准',
+'即将开始陀螺仪校准，过程中请保持设备静止。是否继续？',
+() => {
+this.textContent = '校准中...';
+setTimeout(() => {
+this.innerHTML = '<i class="ri-refresh-line mr-2"></i>开始校准';
+showModal('校准完成', '陀螺仪校准已完成！', () => {});
+}, 3000);
+}
+);
+};
+
+document.getElementById('updateBtn').onclick = function() {
+showModal(
+'系统更新',
+'发现新版本 v2.5.4，是否立即更新？更新过程大约需要 5 分钟。',
+() => {
+this.textContent = '更新中...';
+setTimeout(() => {
+this.textContent = '立即更新';
+showModal('更新完成', '系统已更新至最新版本！', () => {});
+}, 3000);
+}
+);
+};
+
+document.getElementById('resetBtn').onclick = function() {
+showModal(
+'恢复出厂设置',
+'此操作将清除所有数据并重置系统，是否继续？',
+() => {
+showModal('重置完成', '系统已恢复出厂设置！', () => {});
+}
+);
+};
+
+document.getElementById('saveAllBtn').onclick = function() {
+showModal(
+'保存设置',
+'确认保存所有修改的设置？',
+() => {
+showModal('保存成功', '所有设置已保存！', () => {});
+}
+);
+};
+
+document.addEventListener('click', function(e) {
+if (!e.target.closest('#timezoneBtn') && !e.target.closest('#timezoneDropdown')) {
+document.getElementById('timezoneDropdown').classList.add('hidden');
+}
+});
+</script>
+</body>
+</html>

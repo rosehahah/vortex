@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>破拆作业 - 地震破拆救援机器人控制系统</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script>tailwind.config={theme:{extend:{colors:{primary:'#FF5A07',secondary:'#475569'},borderRadius:{'none':'0px','sm':'4px',DEFAULT:'8px','md':'12px','lg':'16px','xl':'20px','2xl':'24px','3xl':'32px','full':'9999px','button':'8px'}}}}</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/remixicon@4.5.0/fonts/remixicon.css" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.5.0/echarts.min.js"></script>
+<style>
+:where([class^="ri-"])::before { content: "\f3c2"; }
+.status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+  margin-right: 6px;
+}
+.status-dot.active { background-color: #22c55e; }
+.status-dot.inactive { background-color: #ef4444; }
+.status-dot.warning { background-color: #f59e0b; }
+</style>
+</head>
+<body class="bg-gray-900 min-h-screen text-gray-100">
+<div class="flex h-screen">
+<aside class="w-64 bg-gray-800 shadow-lg">
+<div class="p-4 border-b">
+<img src="logo-white-03.svg" alt="VORTEX Logo" class="h-8 mb-2">
+<h1 class="text-xl font-bold text-primary">VORTEX控制系统</h1>
+</div>
+<nav class="p-4 space-y-2">
+<a href="1-系统控制界面.html" class="flex items-center p-3 text-gray-300 hover:bg-gray-700 rounded-button">
+<i class="ri-dashboard-line mr-3"></i>
+<span>系统概览</span>
+</a>
+<a href="2-远程控制页面.html" class="flex items-center p-3 text-gray-300 hover:bg-gray-700 rounded-button">
+<i class="ri-remote-control-line mr-3"></i>
+<span>远程控制</span>
+</a>
+<a href="3-环境感知.html" class="flex items-center p-3 text-gray-300 hover:bg-gray-700 rounded-button">
+<i class="ri-eye-line mr-3"></i>
+<span>环境感知</span>
+</a>
+<a href="4-破拆作业功能页面.html" class="flex items-center p-3 bg-primary text-white rounded-button">
+<i class="ri-tools-line mr-3"></i>
+<span>破拆作业</span>
+</a>
+<a href="5-通信管理页面.html" class="flex items-center p-3 text-gray-300 hover:bg-gray-700 rounded-button">
+<i class="ri-signal-tower-line mr-3"></i>
+<span>通信管理</span>
+</a>
+<a href="6-系统设置页面.html" class="flex items-center p-3 text-gray-300 hover:bg-gray-700 rounded-button">
+<i class="ri-settings-3-line mr-3"></i>
+<span>系统设置</span>
+</a>
+</nav>
+</aside>
+
+<main class="flex-1 overflow-auto">
+<header class="bg-gray-800 shadow-sm p-4">
+<div class="flex justify-between items-center">
+<div class="flex items-center space-x-6">
+<div class="flex items-center">
+<span class="status-dot active"></span>
+<span class="font-medium">工具状态: 运行中</span>
+</div>
+<div class="flex items-center">
+<i class="ri-battery-2-line text-green-500 mr-2"></i>
+<span>电量: 85%</span>
+</div>
+<div class="flex items-center">
+<i class="ri-temp-hot-line text-yellow-500 mr-2"></i>
+<span>温度: 42°C</span>
+</div>
+</div>
+<button id="emergencyStop" class="bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded-button flex items-center">
+<i class="ri-stop-circle-line mr-2"></i>
+紧急停止
+</button>
+</div>
+</header>
+
+<div class="p-6 grid grid-cols-2 gap-6">
+<div class="bg-gray-800 p-6 rounded-lg shadow">
+<div class="flex justify-between items-center mb-4">
+<h2 class="text-lg font-medium">破拆工具状态</h2>
+<div class="flex items-center space-x-2">
+<button id="refreshStatus" class="text-gray-400 hover:text-white">
+<i class="ri-refresh-line text-xl"></i>
+</button>
+</div>
+</div>
+<div class="grid grid-cols-2 gap-4">
+<div class="bg-gray-700 p-4 rounded-lg">
+<div class="text-sm text-gray-400">当前工具</div>
+<div class="text-xl font-medium mt-1">液压破碎锤</div>
+<div class="text-xs text-green-500 mt-1">状态正常</div>
+</div>
+<div class="bg-gray-700 p-4 rounded-lg">
+<div class="text-sm text-gray-400">工作时长</div>
+<div class="text-xl font-medium mt-1">1小时45分</div>
+<div class="text-xs text-blue-500 mt-1">持续工作中</div>
+</div>
+<div class="bg-gray-700 p-4 rounded-lg">
+<div class="text-sm text-gray-400">液压压力</div>
+<div class="text-xl font-medium mt-1">18.5 MPa</div>
+<div class="text-xs text-green-500 mt-1">压力正常</div>
+</div>
+<div class="bg-gray-700 p-4 rounded-lg">
+<div class="text-sm text-gray-400">冷却系统</div>
+<div class="text-xl font-medium mt-1">42°C</div>
+<div class="text-xs text-yellow-500 mt-1">温度偏高</div>
+</div>
+</div>
+<div id="pressureChart" class="h-48 mt-4"></div>
+</div>
+
+<div class="bg-gray-800 p-6 rounded-lg shadow">
+<div class="flex justify-between items-center mb-4">
+<h2 class="text-lg font-medium">作业参数配置</h2>
+<button id="saveConfig" class="bg-primary text-white px-3 py-1 rounded-button text-sm">
+保存配置
+</button>
+</div>
+<div class="space-y-4">
+<div>
+<label class="block text-sm text-gray-400 mb-2">作业模式</label>
+<div class="grid grid-cols-3 gap-2" id="workModeGroup">
+<button class="bg-primary text-white p-2 rounded-button text-sm" data-mode="标准模式">标准模式</button>
+<button class="bg-gray-700 text-gray-300 p-2 rounded-button text-sm" data-mode="强力模式">强力模式</button>
+<button class="bg-gray-700 text-gray-300 p-2 rounded-button text-sm" data-mode="精细模式">精细模式</button>
+</div>
+</div>
+<div>
+<label class="block text-sm text-gray-400 mb-2">破拆力度 (当前: 65%)</label>
+<input type="range" class="w-full" min="0" max="100" value="65">
+</div>
+<div>
+<label class="block text-sm text-gray-400 mb-2">工作速度 (当前: 中速)</label>
+<select class="w-full bg-gray-700 border-none rounded p-2 text-white">
+<option>低速</option>
+<option selected>中速</option>
+<option>高速</option>
+</select>
+</div>
+<div>
+<label class="block text-sm text-gray-400 mb-2">安全限制</label>
+<div class="space-y-2">
+<label class="flex items-center">
+<input type="checkbox" class="mr-2" checked>
+超温自动停止
+</label>
+<label class="flex items-center">
+<input type="checkbox" class="mr-2" checked>
+压力过载保护
+</label>
+<label class="flex items-center">
+<input type="checkbox" class="mr-2" checked>
+倾角限制
+</label>
+</div>
+</div>
+</div>
+</div>
+
+<div class="bg-gray-800 p-6 rounded-lg shadow">
+<div class="flex justify-between items-center mb-4">
+<h2 class="text-lg font-medium">作业进度</h2>
+<div class="flex items-center space-x-2">
+<span class="text-sm text-gray-400">实时</span>
+<button id="toggleAutoRefresh" class="relative inline-flex items-center h-6 rounded-full w-11 bg-gray-600">
+<span class="translate-x-6 inline-block w-4 h-4 transform bg-white rounded-full"></span>
+</button>
+</div>
+</div>
+<div class="flex items-center justify-center mb-6">
+<div class="relative w-32 h-32">
+<svg class="w-full h-full" viewBox="0 0 36 36">
+<path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="#374151" stroke-width="3"/>
+<path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="#FF5A07" stroke-width="3" stroke-dasharray="75, 100"/>
+</svg>
+<div class="absolute inset-0 flex items-center justify-center">
+<span class="text-3xl font-bold">75%</span>
+</div>
+</div>
+</div>
+<div id="progressChart" class="h-48"></div>
+</div>
+
+<div class="bg-gray-800 p-6 rounded-lg shadow">
+<div class="flex justify-between items-center mb-4">
+<h2 class="text-lg font-medium">安全警告</h2>
+<button id="clearWarnings" class="text-gray-400 hover:text-white">
+<i class="ri-delete-bin-line text-xl"></i>
+</button>
+</div>
+<div class="space-y-3">
+<div class="flex items-center bg-yellow-900 bg-opacity-20 p-3 rounded">
+<i class="ri-error-warning-line text-yellow-500 text-xl mr-3"></i>
+<div>
+<div class="font-medium">温度警告</div>
+<div class="text-sm text-gray-400">设备温度接近阈值，建议降低工作强度</div>
+</div>
+</div>
+<div class="flex items-center bg-blue-900 bg-opacity-20 p-3 rounded">
+<i class="ri-information-line text-blue-500 text-xl mr-3"></i>
+<div>
+<div class="font-medium">维护提醒</div>
+<div class="text-sm text-gray-400">设备已持续工作1小时45分，建议检查</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+</div>
+
+<script>
+const mockData = {
+pressure: {
+timestamps: ['14:25', '14:26', '14:27', '14:28', '14:29', '14:30'],
+values: [18.2, 18.3, 18.4, 18.5, 18.5, 18.5]
+},
+progress: {
+timestamps: ['14:00', '14:06', '14:12', '14:18', '14:24', '14:30'],
+values: [0, 15, 30, 45, 60, 75]
+}
+};
+
+const pressureChart = echarts.init(document.getElementById('pressureChart'));
+pressureChart.setOption({
+animation: false,
+grid: {
+top: 20,
+right: 20,
+bottom: 30,
+left: 50
+},
+xAxis: {
+type: 'category',
+data: mockData.pressure.timestamps,
+axisLine: { lineStyle: { color: '#4b5563' } }
+},
+yAxis: {
+type: 'value',
+name: 'MPa',
+axisLine: { lineStyle: { color: '#4b5563' } }
+},
+series: [{
+data: mockData.pressure.values,
+type: 'line',
+smooth: true,
+lineStyle: { color: 'rgba(87, 181, 231, 1)' },
+areaStyle: {
+color: {
+type: 'linear',
+x: 0, y: 0, x2: 0, y2: 1,
+colorStops: [{
+offset: 0,
+color: 'rgba(87, 181, 231, 0.2)'
+}, {
+offset: 1,
+color: 'rgba(87, 181, 231, 0)'
+}]
+}
+}
+}]
+});
+
+const progressChart = echarts.init(document.getElementById('progressChart'));
+progressChart.setOption({
+animation: false,
+grid: {
+top: 20,
+right: 20,
+bottom: 30,
+left: 50
+},
+xAxis: {
+type: 'category',
+data: mockData.progress.timestamps,
+axisLine: { lineStyle: { color: '#4b5563' } }
+},
+yAxis: {
+type: 'value',
+name: '%',
+max: 100,
+axisLine: { lineStyle: { color: '#4b5563' } }
+},
+series: [{
+data: mockData.progress.values,
+type: 'line',
+smooth: true,
+lineStyle: { color: 'rgba(251, 191, 114, 1)' },
+areaStyle: {
+color: {
+type: 'linear',
+x: 0, y: 0, x2: 0, y2: 1,
+colorStops: [{
+offset: 0,
+color: 'rgba(251, 191, 114, 0.2)'
+}, {
+offset: 1,
+color: 'rgba(251, 191, 114, 0)'
+}]
+}
+}
+}]
+});
+
+document.getElementById('emergencyStop').addEventListener('click', function() {
+const modal = document.createElement('div');
+modal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
+modal.innerHTML = `
+<div class="bg-gray-800 p-6 rounded-lg shadow-xl w-96">
+<div class="text-center">
+<i class="ri-error-warning-line text-red-500 text-5xl mb-4"></i>
+<h3 class="text-xl font-bold mb-4">确认紧急停止?</h3>
+<p class="text-gray-400 mb-6">此操作将立即停止所有破拆作业，请确认是否继续？</p>
+</div>
+<div class="flex justify-center space-x-4">
+<button class="px-6 py-2 bg-gray-700 text-white rounded-button" onclick="this.closest('.fixed').remove()">取消</button>
+<button class="px-6 py-2 bg-red-600 text-white rounded-button" onclick="handleEmergencyStop(this)">确认停止</button>
+</div>
+</div>
+`;
+document.body.appendChild(modal);
+});
+
+function handleEmergencyStop(button) {
+button.closest('.fixed').remove();
+const notification = document.createElement('div');
+notification.className = 'fixed top-4 right-4 bg-red-500 text-white px-6 py-3 rounded shadow-lg z-50';
+notification.textContent = '已紧急停止所有作业';
+document.body.appendChild(notification);
+setTimeout(() => notification.remove(), 3000);
+}
+
+document.getElementById('saveConfig').addEventListener('click', function() {
+const notification = document.createElement('div');
+notification.className = 'fixed top-4 right-4 bg-green-500 text-white px-6 py-3 rounded shadow-lg z-50';
+notification.textContent = '配置已保存';
+document.body.appendChild(notification);
+setTimeout(() => notification.remove(), 3000);
+});
+
+window.addEventListener('resize', function() {
+pressureChart.resize();
+progressChart.resize();
+});
+
+window.addEventListener('DOMContentLoaded', function() {
+  const group = document.getElementById('workModeGroup');
+  if (group) {
+    group.querySelectorAll('button').forEach(btn => {
+      btn.onclick = function() {
+        group.querySelectorAll('button').forEach(b => {
+          b.classList.remove('bg-primary','text-white');
+          b.classList.add('bg-gray-700','text-gray-300');
+        });
+        this.classList.add('bg-primary','text-white');
+        this.classList.remove('bg-gray-700','text-gray-300');
+      };
+    });
+  }
+});
+</script>
+</body>
+</html>
